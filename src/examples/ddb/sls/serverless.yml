@@ -1,0 +1,16 @@
+# Serverless config for table from example
+resources:
+  Resources:
+
+    ExampleTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: ${self:custom.tableRetention}
+      Properties:
+        TableName: "ExampleTable"
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
