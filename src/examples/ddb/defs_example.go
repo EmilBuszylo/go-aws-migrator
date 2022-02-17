@@ -8,10 +8,10 @@ import (
 	"golang-migrator-example/src/migrator"
 )
 
-// defsExample contains definitions of our migrations
+// DefsExample contains definitions of our migrations
 // conf - needs for use some AWS services inside our function for example: SQS, SNS, lambda ..
 // db - necessary to use DDB table
-func defsExample(ctx context.Context, conf aws.Config, db *dynamodb.Client) []migrator.Definition {
+func DefsExample(ctx context.Context, conf aws.Config, db *dynamodb.Client) []migrator.Definition {
 	return []migrator.Definition{
 		{
 			Name: "#1 example migration",

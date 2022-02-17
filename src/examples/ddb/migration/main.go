@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 
@@ -43,13 +44,21 @@ func main() {
 	db := dynamodb.NewFromConfig(conf)
 
 	o := migrator.DefaultDDBProviderOptions{
-		Ctx:          ctx,
 		MigrationSet: set,
 		Conf:         conf,
 		DB:           db,
 	}
 
-	defs, err := ddb.Provide(&o)
+	var defs []migrator.Definition
+	switch set {
+	case "example":
+		defs, err = ddb.DefsExample(ctx, o.Conf, o.DB), nil
+	default:
+		defs, err = nil, fmt.Errorf("unknown migration set: %s", o.MigrationSet)
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	m := migrator.New(db, table)
 	summary, err := m.Run(ctx, set, defs)

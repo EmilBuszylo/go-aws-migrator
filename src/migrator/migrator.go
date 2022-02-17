@@ -29,7 +29,6 @@ type DefaultDDBProvider interface {
 
 // DefaultDDBProviderOptions provide defaults options of migration provider for DDB migrations
 type DefaultDDBProviderOptions struct {
-	Ctx          context.Context
 	MigrationSet string
 	Conf         aws.Config
 	DB           *dynamodb.Client
