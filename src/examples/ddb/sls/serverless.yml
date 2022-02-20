@@ -6,7 +6,7 @@ resources:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: ${self:custom.tableRetention}
       Properties:
-        TableName: "ExampleTable"
+        TableName: "example-records-table"
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 )
 
@@ -21,16 +20,9 @@ type API interface {
 	Query(context.Context, *dynamodb.QueryInput, ...func(*dynamodb.Options)) (*dynamodb.QueryOutput, error)
 }
 
-// DefaultDDBProvider proposition of provider for your migration definitions.
-// this provider is a perfect choice if you want to make migrate on DDB tables.
-type DefaultDDBProvider interface {
-	Provide(ctx context.Context, migrationSet string, sess aws.Config, db *dynamodb.Client) ([]Definition, error)
-}
-
 // DefaultDDBProviderOptions provide defaults options of migration provider for DDB migrations
 type DefaultDDBProviderOptions struct {
 	MigrationSet string
-	Conf         aws.Config
 	DB           *dynamodb.Client
 }
 

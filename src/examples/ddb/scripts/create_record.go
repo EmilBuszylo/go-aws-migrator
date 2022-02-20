@@ -17,7 +17,6 @@ type ExampleRecord struct {
 
 // CreateRecord creates a single record of ExampleRecord in DDB
 func CreateRecord(ctx context.Context, db *dynamodb.Client, tableName string) error {
-
 	r := ExampleRecord{
 		ID:        uuid.NewString(),
 		CreatedAt: time.Now(),

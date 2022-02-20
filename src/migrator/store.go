@@ -34,6 +34,7 @@ func (m *Migrator) Run(ctx context.Context, migrationSet string, defs []Definiti
 	}
 
 	var executions []Execution
+	// iterate through all definitions and try to run function from a single definition
 	for i := len(defs) - currentVersion - 1; i >= 0; i-- {
 		def := defs[i]
 		firedAt := time.Now()
@@ -68,7 +69,7 @@ func (m *Migrator) Run(ctx context.Context, migrationSet string, defs []Definiti
 				Executions:      executions,
 			}, err
 		}
-
+		// If everything is fine, we raise a version
 		currentVersion++
 	}
 
@@ -108,49 +109,36 @@ func (m *Migrator) put(ctx context.Context, v version) error {
 	return nil
 }
 
-// list gets our previous migrations by specific migrationSet and limit
-func (m *Migrator) list(ctx context.Context, migrationSet string, limit int) ([]version, error) {
+// get a previous migration record from database for specific migrationSet
+func (m *Migrator) get(ctx context.Context, migrationSet string) (version, error) {
 	expr, err := expression.NewBuilder().WithKeyCondition(
 		expression.KeyEqual(expression.Key("migration_set"), expression.Value(migrationSet))).Build()
 	if err != nil {
-		return nil, err
+		return version{}, err
 	}
 
 	out, err := m.db.Query(ctx, &dynamodb.QueryInput{
 		ExpressionAttributeNames:  expr.Names(),
 		ExpressionAttributeValues: expr.Values(),
 		KeyConditionExpression:    expr.KeyCondition(),
-		Limit:                     aws.Int32(int32(limit)),
+		// we need to only one (the last) record from database
+		Limit: aws.Int32(int32(1)),
 		// descending order
 		ScanIndexForward: aws.Bool(false),
 		TableName:        aws.String(m.tableName),
 	})
 	if err != nil {
-		return nil, err
+		return version{}, err
 	}
 
 	if len(out.Items) == 0 {
-		return nil, nil
+		return version{}, nil
 	}
 
 	var v []version
 	err = attributevalue.UnmarshalListOfMaps(out.Items, &v)
 	if err != nil {
-		return nil, err
-	}
-
-	return v, nil
-}
-
-// get provide latest migration data
-func (m *Migrator) get(ctx context.Context, migrationSet string) (version, error) {
-	v, err := m.list(ctx, migrationSet, 1)
-	if err != nil {
 		return version{}, err
-	}
-
-	if len(v) != 1 {
-		return version{}, nil
 	}
 
 	return v[0], nil
